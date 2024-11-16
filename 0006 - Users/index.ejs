@@ -1,0 +1,29 @@
+<h1>CafeJS</h1>
+
+<nav>
+    <a href="/">Home</a>
+    <% if (user) { %>
+        <form action="/logout" method="POST" style="display: inline;">
+            <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">Logout</button>
+        </form>
+    <% } else { %>
+        <a href="/login">Login</a>
+    <% } %>
+</nav>
+
+<% if (user) { %>
+    <p>Welcome, <%= user.username %>!</p>
+<% } %>
+
+<h2>Products</h2>
+<% if (products.length > 0) { %>
+    <ul>
+        <% products.forEach((product) => { %>
+            <li>
+                <a href="/product/<%= product.id %>"><%= product.name %></a> - PHP <%= product.price %>
+            </li>
+        <% }); %>
+    </ul>
+<% } else { %>
+    <p>No products available at the moment. Please check back later!</p>
+<% } %>
