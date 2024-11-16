@@ -1,0 +1,10 @@
+<h1>CafeJS</h1>
+
+<h2>Products</h2>
+<ul>
+    <% products.forEach((product) => { %>
+        <li>
+            <a href="/product/<%= product.id %>"><%= product.name %></a> - PHP <%= product.price %>
+        </li>
+    <% }); %>
+</ul>
