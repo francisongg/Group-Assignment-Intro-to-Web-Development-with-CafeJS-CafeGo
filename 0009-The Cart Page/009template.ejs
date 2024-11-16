@@ -1,0 +1,16 @@
+<h1>CafeJS</h1>
+
+
+<p>Welcome, <%= user.username %>!</p> 
+
+<a href="/">Back to home page</a>
+
+<a href="/cart">View my cart</a>
+
+<h2>My Cart</h2>
+
+<ul>
+    <% cartItems.forEach((cartItem) => { %>
+        <li><%= cartItem.quantity %> - <%= cartItem.productName %></li>
+    <% }); %>
+</ul>
