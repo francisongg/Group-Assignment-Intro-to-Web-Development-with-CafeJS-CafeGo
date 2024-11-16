@@ -6,11 +6,12 @@ function initializeDatabase() {
     db.serialize(() => {
         db.run("CREATE TABLE IF NOT EXISTS cjs_user (username TEXT, password TEXT)");
         db.run("CREATE TABLE IF NOT EXISTS cjs_product (name TEXT, price INTEGER, description TEXT)");
+        db.run("CREATE TABLE IF NOT EXISTS cjs_session (token TEXT, user_id INTEGER)");
 
         // Seed users if table is empty
         db.get('SELECT COUNT(*) AS count FROM cjs_user', [], (err, row) => {
             if (err) {
-                console.error(err);
+                console.error("Error fetching user count:", err);
                 return;
             }
             if (row.count === 0) {
@@ -27,7 +28,7 @@ function initializeDatabase() {
         // Seed products if table is empty
         db.get('SELECT COUNT(*) AS count FROM cjs_product', [], (err, row) => {
             if (err) {
-                console.error(err);
+                console.error("Error fetching product count:", err);
                 return;
             }
             if (row.count === 0) {
@@ -82,11 +83,56 @@ function getProductById(id) {
     });
 }
 
-// Export functions
+// Session handling functions
+function createSession(token, userId) {
+    return new Promise((resolve, reject) => {
+        db.run('INSERT INTO cjs_session (token, user_id) VALUES (?, ?)', [token, userId], (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+function getUserBySessionToken(token) {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT user_id FROM cjs_session WHERE token = ?', [token], (err, row) => {
+            if (err) {
+                reject(err);
+            } else if (row) {
+                getUserById(row.user_id).then(resolve).catch(reject);
+            } else {
+                resolve(null);
+            }
+        });
+    });
+}
+
+function getUserById(userId) {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT rowid, * FROM cjs_user WHERE rowid = ?', [userId], (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row ? {
+                    id: row.rowid,
+                    username: row.username,
+                    password: row.password
+                } : null);
+            }
+        });
+    });
+}
+
 module.exports = {
     initializeDatabase,
     getProducts,
-    getProductById
+    getProductById,
+    createSession,
+    getUserBySessionToken,
+    getUserById
 };
 
 // Call initialize to set up tables
